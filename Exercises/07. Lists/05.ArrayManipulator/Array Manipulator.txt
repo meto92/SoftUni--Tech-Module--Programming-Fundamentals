@@ -1,0 +1,115 @@
+//---------------------------------------Memory issues. Using array---------------------------------------
+
+using System;
+using System.Linq;
+
+class ArrayManipulator
+{
+    static void AddElement(ref int[] nums, string[] stringParams)
+    {
+        int index = int.Parse(stringParams[1]);
+        int element = int.Parse(stringParams[2]);
+
+        int[] temp = new int[nums.Length + 1];
+
+        temp[index] = element;
+        Array.Copy(nums, temp, index);
+        Array.Copy(nums, index, temp, index + 1, nums.Length - index);
+
+        nums = temp;
+    }
+
+    static void AddManyElements(ref int[] nums, string[] stringParams)
+    {
+        int index = int.Parse(stringParams[1]);
+        int[] newElements = stringParams.Skip(2).Take(stringParams.Length - 2).Select(int.Parse).ToArray();
+
+        int[] temp = new int[nums.Length + newElements.Length];
+
+        Array.Copy(nums, temp, index);
+        Array.Copy(newElements, 0, temp, index, newElements.Length);
+        Array.Copy(nums, index, temp, index + newElements.Length, nums.Length - index);
+
+        nums = temp;
+    }
+
+    static void Remove(ref int[] nums, int index)
+    {
+        int[] temp = new int[nums.Length - 1];
+
+        Array.Copy(nums, temp, index);
+        Array.Copy(nums, index + 1, temp, index, nums.Length - index - 1);
+
+        nums = temp;
+    }
+
+    static void ShiftLeft(int[] nums, int positions)
+    {
+        int[] temp = (int[])nums.Clone();
+
+        for (int i = 0; i < nums.Length; i++)
+        {
+            nums[i] = temp[(i + positions) % nums.Length];
+        }
+    }
+
+    static void SumPairs(ref int[] nums)
+    {
+        int[] temp = new int[(int)Math.Ceiling(nums.Length / 2.0)];
+
+        for (int i = 0, j = 0; i < nums.Length - 1; i+=2, j++)
+        {
+            temp[j] = nums[i] + nums[i + 1];
+        }
+
+        if (nums.Length % 2 != 0)
+        {
+            temp[temp.Length - 1] = nums[nums.Length - 1];
+        }
+
+        nums = temp;
+    }
+
+    static void Main(string[] args)
+    {
+        int[] nums = Console.ReadLine().Split(' ').Select(int.Parse).ToArray();
+
+        string command;
+        
+        while ((command = Console.ReadLine()) != "print")
+        {
+            string[] stringParams = command.Split();
+
+            string action = stringParams[0];
+
+            switch (action)
+            {
+                case "add":
+                    AddElement(ref nums, stringParams);
+                    break;
+                case "addMany":
+                    AddManyElements(ref nums, stringParams);
+                    break;
+                case "contains":
+                    int element = int.Parse(stringParams[1]);
+                    Console.WriteLine(Array.IndexOf(nums, element));
+                    break;
+                case "remove":
+                    int index = int.Parse(stringParams[1]);
+                    Remove(ref nums, index);
+                    break;
+                case "shift":
+                    int positions = int.Parse(stringParams[1]);
+                    ShiftLeft(nums, positions);
+                    break;
+                case "sumPairs":
+                    SumPairs(ref nums);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        Console.WriteLine($"[{string.Join(", ", nums)}]");
+    }
+}

@@ -1,0 +1,59 @@
+using System;
+using System.Linq;
+using System.Collections.Generic;
+
+class LongestIncreasingSubsequence
+{
+    static void SetArrays(List<int> numbers, int[] len, int[] prev)
+    {
+        len[0] = 1;
+        prev[0] = -1;
+
+        for (int rightIndex = 1; rightIndex < numbers.Count; rightIndex++)
+        {
+            len[rightIndex] = 1;
+            prev[rightIndex] = -1;
+
+            int right = numbers[rightIndex];
+
+            for (int leftIndex = 0; leftIndex < rightIndex; leftIndex++)
+            {
+                int left = numbers[leftIndex];
+
+                if (len[leftIndex] + 1 > len[rightIndex] && left < right)
+                {
+                    len[rightIndex] = len[leftIndex] + 1;
+                    prev[rightIndex] = leftIndex;
+                }
+            }
+        }
+    }
+
+    static void PrintResult(List<int> numbers, int[] len, int[] prev)
+    {
+        int lenIndex = Array.IndexOf(len, len.Max());
+        int index = prev[lenIndex];
+
+        Stack<int> result = new Stack<int>();
+        result.Push(numbers[lenIndex]);
+
+        while (index != -1)
+        {
+            result.Push(numbers[index]);
+            index = prev[index];
+        }
+
+        Console.WriteLine(string.Join(" ", result));
+    }
+
+    static void Main(string[] args)
+    {
+        List<int> numbers = Console.ReadLine().Split(' ').Select(int.Parse).ToList();
+
+        int[] len = new int[numbers.Count];
+        int[] prev = new int[numbers.Count];
+
+        SetArrays(numbers, len, prev);
+        PrintResult(numbers, len, prev);
+    }
+}
